@@ -1,0 +1,44 @@
+﻿@model AppointmentManager.Models.Appointment
+@{
+    ViewData["Title"] = "Delete Appointment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Delete Appointment</h1>
+            <hr />
+
+            <div class="alert alert-danger">
+                <h4>Are you sure you want to delete this appointment?</h4>
+                <p>This action cannot be undone.</p>
+            </div>
+
+            <div>
+                <dl class="row">
+                    <dt class="col-sm-3">Name</dt>
+                    <dd class="col-sm-9">@Model.Name</dd>
+
+                    <dt class="col-sm-3">Location</dt>
+                    <dd class="col-sm-9">@Model.Location</dd>
+
+                    <dt class="col-sm-3">Start Time</dt>
+                    <dd class="col-sm-9">@Model.StartTime.ToString("g")</dd>
+
+                    <dt class="col-sm-3">End Time</dt>
+                    <dd class="col-sm-9">@Model.EndTime.ToString("g")</dd>
+
+                    <dt class="col-sm-3">Group Meeting</dt>
+                    <dd class="col-sm-9">@(Model.IsGroupMeeting ? "Yes" : "No")</dd>
+                </dl>
+            </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <a asp-action="Index" class="btn btn-secondary">Back to Calendar</a>
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>

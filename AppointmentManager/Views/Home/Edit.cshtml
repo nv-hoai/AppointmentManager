@@ -1,0 +1,142 @@
+﻿@model AppointmentManager.Models.ViewModels.AppointmentViewModel
+@{
+    ViewData["Title"] = "Edit Appointment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Edit Appointment</h1>
+            <hr />
+
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Location" class="form-label"></label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Date" class="form-label"></label>
+                    <input asp-for="Date" type="date" class="form-control" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="StartTime" class="form-label">Start Time</label>
+                        <input asp-for="StartTime" type="text" class="form-control datetimepicker" />
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="EndTime" class="form-label">End Time</label>
+                        <input asp-for="EndTime" type="text" class="form-control datetimepicker" />
+                        <span asp-validation-for="EndTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ReminderMinutes" class="form-label"></label>
+                    <select asp-for="ReminderMinutes" class="form-select">
+                        <option value="">No reminder</option>
+                        <option value="15">15 minutes before</option>
+                        <option value="30">30 minutes before</option>
+                        <option value="60">1 hour before</option>
+                        <option value="1440">1 day before</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsGroupMeeting" class="form-check-input" />
+                    <label asp-for="IsGroupMeeting" class="form-check-label"></label>
+                </div>
+
+
+                <div class="mb-3">
+                    <a asp-action="Index" class="btn btn-secondary">Back to Calendar</a>
+                    @if (Model.IsOwner)
+                    {
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-warning" onclick="leaveMeeting(@Model.Id)">Leave Meeting</button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr(".datetimepicker", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "h:i K",
+                time_24hr: false
+            });
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById("Date");
+            const startTimeInput = document.getElementById("StartTime");
+            const endTimeInput = document.getElementById("EndTime");
+
+            endTimeInput.addEventListener('change', function() {
+                validateTimes();
+            });
+
+            startTimeInput.addEventListener('change', function() {
+                validateTimes();
+            });
+
+            function validateTimes() {
+                const startDateTime = new Date(`${dateInput.value}T${startTimeInput.value}`);
+                const endDateTime = new Date(`${dateInput.value}T${endTimeInput.value}`);
+
+                if (startDateTime && endDateTime) {
+                    if (endDateTime <= startDateTime) {
+                        endTimeInput.setCustomValidity("End time must be after start time");
+                    } else {
+                        endTimeInput.setCustomValidity("");
+                    }
+                }
+            }
+        });
+
+        function leaveMeeting(id) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/Home/LeaveMeeting';
+
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+            form.appendChild(idInput);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+
+    </script>
+}
